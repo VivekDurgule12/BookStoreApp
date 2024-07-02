@@ -10,7 +10,7 @@ const app = express()
 
 app.use(cors(
     {
-    origin:["https://book-store-app-pink.vercel.app/"],
+    origin:[""],
         method:["POST","GET"],
         credentials:true
     }
