@@ -33,7 +33,7 @@ try {
 app.use("/user",userRoute);
 app.use("/book",bookRoute);
 
-// 
+// deployement
 if(process.env.NODE_ENV === "production"){
     const dirpath = path.resolve();
     app.use(express.static("FRONTEND/dist"));
@@ -46,5 +46,3 @@ if(process.env.NODE_ENV === "production"){
 app.listen(PORT, () => {
     console.log(`server is listening on port ${PORT}`)
 })
-
-// 3:43 stoped
