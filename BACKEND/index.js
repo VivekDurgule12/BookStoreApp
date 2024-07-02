@@ -8,7 +8,13 @@ import userRoute from "./route/user.route.js"
 
 const app = express()
 
-app.use(cors());
+app.use(cors(
+    {
+    origin:["https://book-store-app-pink.vercel.app/"],
+        method:["POST","GET"],
+        credentials:true
+    }
+));
 app.use(express.json());
 
 dotenv.config(); 
