@@ -1,54 +1,54 @@
-import express from "express"
-import dotenv from "dotenv"
-import mongoose from "mongoose"
-import cors from "cors"
-import path from "path"
-import bookRoute from "./route/book.route.js"
-import userRoute from "./route/user.route.js"
+import express from "express";
+import dotenv from "dotenv";
+import mongoose from "mongoose";
+import cors from "cors";
+import path from "path";
+import bookRoute from "./route/book.route.js";
+import userRoute from "./route/user.route.js";
 
-const app = express()
+dotenv.config();
 
-app.use(cors(
-    {
-    origin:["https://book-store-app-pink.vercel.app/"],
-        method:["POST","GET"],
-        credentials:true
-    }
-));
+const app = express();
+
+// Middleware
+app.use(cors({
+    origin: ["https://book-store-app-pink.vercel.app"],
+    methods: ["POST", "GET"],
+    credentials: true
+}));
 app.use(express.json());
 
-dotenv.config(); 
+// Environment variables
+const PORT = process.env.PORT || 4000;
+const URI = process.env.MongoDBURI;
 
-const PORT=process.env.PORT || 4000;
-const URI=process.env.MongoDBURI;
+// Connect to MongoDB
+mongoose.connect(URI, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+}).then(() => {
+    console.log("Connected to MongoDB");
+}).catch((error) => {
+    console.error("Error connecting to MongoDB:", error);
+    process.exit(1); // Exit the process if MongoDB connection fails
+});
 
-// connect to mongoDB
+// Routes
+app.use("/user", userRoute);
+app.use("/book", bookRoute);
 
-try {
-    mongoose.connect(URI,{
-        useNewUrlParser: true,
-        useUnifiedTopology: true,
-    });
-    console.log("Connected to mongoDB");
-} catch (error) {
-    console.log("Error: ", error);
-}
-
-// definging route
-
-app.use("/user",userRoute);
-app.use("/book",bookRoute);
-
-// deployement
-if(process.env.NODE_ENV === "production"){
+// Serve static assets in production
+if (process.env.NODE_ENV === "production") {
     const dirpath = path.resolve();
-    app.use(express.static("FRONTEND/dist"));
-    app.get("*",(req,res)=>{
-        res.sendFile(path.resolve(dirpath,"FRONTEND","dist","index.html"));
-    })
+    app.use(express.static(path.join(dirpath, "FRONTEND", "dist")));
+
+    // Serve index.html for any other route
+    app.get("*", (req, res) => {
+        res.sendFile(path.resolve(dirpath, "FRONTEND", "dist", "index.html"));
+    });
 }
 
-
+// Start server
 app.listen(PORT, () => {
-    console.log(`server is listening on port ${PORT}`)
-})
+    console.log(`Server is listening on port ${PORT}`);
+});
